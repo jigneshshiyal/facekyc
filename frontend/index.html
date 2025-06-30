@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Face Blink Detection</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #fff;
+      color: #333;
+      text-align: center;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 { color: #0077cc; margin-bottom: 20px; }
+    #webcamButton {
+      padding: 10px 20px; font-size: 1rem;
+      background-color: #0077cc; color: #fff;
+      border: none; border-radius: 8px;
+      cursor: pointer; transition: 0.3s;
+    }
+    #webcamButton:hover { background-color: #005fa3; }
+    #liveView { position: relative; display: inline-block; margin-top: 20px; }
+    #webcam, #overlayCanvas {
+      width: 640px; height: auto; border-radius: 12px;
+    }
+    #overlayCanvas {
+      position: absolute; top: 0; left: 0;
+      z-index: 2; pointer-events: none;
+    }
+    video {
+      width: 640px; height: auto; border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 119, 204, 0.3); z-index: 1;
+    }
+    #webcamPredictions, #warning {
+      margin: 10px 0; font-size: 1.2rem;
+    }
+    #warning {
+      color: orange; font-weight: bold; transition: 0.3s;
+    }
+    #timerBar { width: 640px; margin: 15px 0; height: 20px; border-radius: 10px; }
+    progress::-webkit-progress-bar {
+      background-color: #ddd; border-radius: 10px;
+    }
+    progress::-webkit-progress-value {
+      background-color: #0077cc; border-radius: 10px;
+    }
+    #hiddenCanvas { display: none; }
+    #finalResult {
+      font-size: 1.2rem; font-weight: bold; margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Face Blink Detection</h1>
+  <button id="webcamButton">Enable Webcam</button>
+  <div id="liveView">
+    <video id="webcam" autoplay muted playsinline></video>
+    <canvas id="overlayCanvas"></canvas>
+  </div>
+
+  <progress id="timerBar" value="10" max="10"></progress>
+  <div id="webcamPredictions"></div>
+  <div id="warning"></div>
+  <div id="finalResult"></div>
+  <canvas id="hiddenCanvas"></canvas>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
