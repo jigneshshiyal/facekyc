@@ -39,7 +39,8 @@ const initializeAllModels = async () => {
 
   imageClassifier = await ImageClassifier.createFromOptions(resolver, {
     baseOptions: {
-      modelAssetPath: `http://localhost:8000/model`,
+      modelAssetPath: `https://cdn.jsdelivr.net/gh/jigneshshiyal/face_covering_cls_model_int8@main/face_covering_cls_model_int8.tflite
+`,
     },
     maxResults: 1,
     runningMode,
