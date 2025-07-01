@@ -17,7 +17,7 @@ app.add_middleware(
 
 @app.get("/model")
 def get_model():
-    model_path = os.path.join("./web_model", "model_int8.tflite")
+    model_path = os.path.join("./web_model", "face_covering_cls_model_int8.tflite")
     return FileResponse(model_path, media_type="application/octet-stream")
 
 def main():
