@@ -57,6 +57,12 @@
 </head>
 <body>
   <h1>Face Blink Detection</h1>
+  <!-- Add below inside <body>, preferably before <script> -->
+<input type="text" id="userName" placeholder="Enter your name" style="margin-top:20px;padding:10px;width:300px;border-radius:8px;border:1px solid #ccc;" />
+
+<div id="loader" style="display:none;margin-top:15px;">Loading...</div>
+<div id="serverResult" style="margin-top:15px;font-weight:bold;"></div>
+
   <button id="webcamButton">Enable Webcam</button>
   <div id="liveView">
     <video id="webcam" autoplay muted playsinline></video>

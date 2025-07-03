@@ -15,15 +15,20 @@ const labels = ["covering", "plain"];
 const overlayCanvas = document.getElementById("overlayCanvas");
 const overlayCtx = overlayCanvas.getContext("2d");
 
+const userNameInput = document.getElementById("userName");
+const loader = document.getElementById("loader");
+const serverResult = document.getElementById("serverResult");
+
+let finalCapturedBlob = null;
+
+
 const video = document.getElementById("webcam");
 const canvas = document.getElementById("hiddenCanvas");
 const ctx = canvas.getContext("2d");
 const webcamPredictions = document.getElementById("webcamPredictions");
-const liveView = document.getElementById("liveView");
 const warning = document.getElementById("warning");
 const timerBar = document.getElementById("timerBar");
 
-let children = [];
 
 const initializeAllModels = async () => {
   const resolver = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
@@ -39,8 +44,7 @@ const initializeAllModels = async () => {
 
   imageClassifier = await ImageClassifier.createFromOptions(resolver, {
     baseOptions: {
-      modelAssetPath: `https://cdn.jsdelivr.net/gh/jigneshshiyal/face_covering_cls_model_int8@main/face_covering_cls_model_int8.tflite
-`,
+      modelAssetPath: `https://cdn.jsdelivr.net/gh/jigneshshiyal/face_covering_cls_model_int8@main/face_covering_cls_model_int8.tflite`,
     },
     maxResults: 1,
     runningMode,
@@ -85,14 +89,24 @@ const startTimer = () => {
       timer--;
       timerBar.value = timer;
     } else {
+      // When timer ends
       clearInterval(timeInterval);
       timeInterval = null;
 
       if (blinkCounter === 0) {
         warning.innerText = "Try again. No valid blink detected.";
-      } else {
-        warning.innerText = "";
       }
+
+      // Capture final frame
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Save to blob
+      canvas.toBlob(blob => {
+        finalCapturedBlob = blob;
+        uploadImageToServer();  // Send the image after timer ends
+      }, "image/jpeg");
 
       const resultMsg = `
         Face Detected: ${isFaceDetected ? "YES" : "NO"}<br/>
@@ -299,6 +313,47 @@ function displayVideoDetections(dets) {
   }
 
   warning.innerHTML = warnings.join("<br>");
+}
+
+async function uploadImageToServer() {
+  const name = userNameInput.value.trim();
+  if (!name || !finalCapturedBlob) {
+    alert("Please enter your name and ensure the image is captured.");
+    return;
+  }
+
+  loader.style.display = "block";
+  serverResult.innerHTML = "";
+
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("image", finalCapturedBlob, "captured.jpg");
+
+  try {
+    const response = await fetch("http://localhost:8000/face_matching", {
+      method: "POST",
+      body: formData,
+    });
+
+    const result = await response.json();
+    loader.style.display = "none";
+
+    serverResult.innerHTML = `
+      <pre style="text-align:left;background:#f7f7f7;padding:10px;border-radius:10px;">
+<b>Status:</b> ${result.status}
+<b>Message:</b> ${result.message}
+<b>Faces:</b> ${result.num_face}
+<b>File Size:</b> ${result.file_size_bytes} bytes
+<b>Verified:</b> ${result.verified}
+<b>Distance:</b> ${result.distance.toFixed(4)}
+<b>Similarity %:</b> ${result.similarity_percentage.toFixed(2)}%
+<b>Is Face Real:</b> ${result.is_face_real}
+      </pre>`;
+  } catch (error) {
+    loader.style.display = "none";
+    serverResult.innerHTML = "Error uploading image or fetching result.";
+    console.error(error);
+  }
 }
 
 
