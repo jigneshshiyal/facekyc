@@ -44,8 +44,8 @@ This project provides a **face verification system** with the following features
 
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/your-username/face-verification-app.git
-cd face-verification-app
+git clone https://github.com/jigneshshiyal/facekyc.git
+cd facekyc
 ````
 
 ### 2. Backend Setup
